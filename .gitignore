@@ -1,0 +1,89 @@
+# ===== Data (symlink to shared storage / huge) =====
+/data
+/data/
+
+# ===== workspace/ : code + artifacts are interleaved here =====
+# Strategy: ignore EVERYTHING under workspace/, then whitelist only source/config files.
+# This keeps experiment code while dropping checkpoints, datasets, big JSONs, downloads, etc.
+workspace/**
+# allow git to descend into subdirs
+!workspace/**/
+# whitelist source / config / docs only
+!workspace/**/*.py
+!workspace/**/*.sh
+!workspace/**/*.yaml
+!workspace/**/*.yml
+!workspace/**/*.toml
+!workspace/**/*.cfg
+!workspace/**/*.ini
+!workspace/**/*.md
+!workspace/**/*.ipynb
+
+# ===== Generic experiment artifacts (top-level too) =====
+wandb/
+runs/
+outputs/
+output/
+results/
+preds/
+predictions/
+checkpoints/
+ckpt/
+ckpts/
+logs/
+log/
+tb_logs/
+tensorboard/
+cache/
+.cache/
+tmp/
+*.log
+
+# ===== Python env =====
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.ipynb_checkpoints/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ===== Model weights (ship via scp, not git) =====
+*.pth
+*.pt
+*.ckpt
+*.safetensors
+*.onnx
+*.engine
+*.bin
+*.h5
+
+# ===== Vendored external repos / starter kits / large reference assets =====
+# (re-fetch from upstream or scp from the source machine)
+/reference/
+/reference_pe/
+
+# ===== Submission packages: keep our own scripts, drop vendored repos & artifacts =====
+submit/**/.git/
+submit/**/weights/
+submit/**/*.tar
+submit/**/*.tar.gz
+submit/**/*.zip
+
+# ===== Media / large binaries =====
+*.mp4
+*.avi
+*.mov
+*.gif
+*.ply
+*.pkl
+*.npy
+*.npz
+
+# ===== OS / editor =====
+.DS_Store
+*.swp
