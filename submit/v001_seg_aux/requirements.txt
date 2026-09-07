@@ -1,0 +1,7 @@
+# Pinned to match the training venv (../../requirements.txt) so the container
+# preprocesses exactly like training did. torch/torchvision come from the base image.
+SimpleITK==2.5.6
+numpy==2.4.6
+opencv-python-headless==5.0.0.93
+timm==1.0.29
+segmentation-models-pytorch==0.5.0

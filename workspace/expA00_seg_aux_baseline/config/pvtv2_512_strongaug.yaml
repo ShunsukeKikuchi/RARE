@@ -1,0 +1,71 @@
+experiment:
+  name: pvtv2_512_strongaug
+  seed: 42
+  results_root: results
+
+data:
+  folds_csv: workspace/fold/v1/folds.csv
+  external_index: workspace/expA00_seg_aux_baseline/src/external_index.csv
+  # EVC comes from the RARE organisers' own group (van der Sommen, TU/e), so it may
+  # overlap the challenge val/test split. Toggle to run the no-EVC ablation.
+  use_evc: false
+  use_edd2020: true
+  # 512 is the resolution Grand Challenge actually builds its stacks at, so at this
+  # size gc_prescale below becomes the identity: no second resampling, and none of
+  # the detail a 384 member throws away. Every other member sees native->512->384.
+  image_size: 512
+  # Grand Challenge stacks frames at 512 before we ever see them; replicating
+  # that downsample locally makes OOF match the container exactly.
+  gc_prescale: 512
+  # 512 costs ~1.8x the activations of 384; halve the batch and recover the
+  # effective batch with accumulate_grad_batches=2 so it matches the other members.
+  batch_size: 12
+  num_workers: 8
+  # WeightedRandomSampler: RARE25 is only 5.1% positive on its own, so its
+  # positives are boosted to target_pos_ratio *within RARE25's share* of the batch.
+  target_pos_ratio: 0.25
+  # Share of each batch given to EVC/EDD2020. Budgeted separately because those
+  # sets are 68% positive -- a single global class balance would hand them 66% of
+  # every positive the classifier sees (see build_sampler_weights).
+  external_fraction: 0.15
+  aug_preset: strong
+
+model:
+  encoder_name: tu-pvt_v2_b2
+  encoder_weights: imagenet
+  seg_channels: 2          # ch0 = BE extent, ch1 = neoplasia
+  dropout: 0.3
+  pooling: avg
+
+loss:
+  # Set to 0.0 for the seg-free ablation -- everything else stays identical.
+  seg_weight: 0.5
+  pos_weight: null
+
+train:
+  # Exponential moving average of the weights. 0 disables it.
+  # Without EMA the best epoch scattered over 4..25 across folds, which left no
+  # defensible fixed endpoint for all-data training.
+  ema_decay: 0.999
+
+optimizer:
+  lr: 1.0e-4
+  weight_decay: 1.0e-2
+  eta_min: 1.0e-6
+
+trainer:
+  # Every config measured here peaks between epoch 4 and 16 and then decays --
+  # pvtv2_strongaug loses 0.023 val AUROC between its epoch-11 peak and epoch 24.
+  # 20 epochs keeps the peak for all of them and cuts a third of the wall clock.
+  max_epochs: 20
+  precision: 16-mixed
+  accumulate_grad_batches: 2
+  gradient_clip_val: 1.0
+  log_every_n_steps: 20
+
+eval:
+  # In-loop bootstrap is kept cheap; the 1000-iteration reference number is
+  # computed once over the full OOF in evaluate.py.
+  val_bootstrap_iter: 200
+  monitor: val/auroc
+  monitor_mode: max

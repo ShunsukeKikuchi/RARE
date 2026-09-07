@@ -1,0 +1,42 @@
+experiment:
+  name: siglip2_vitb_lora2
+  seed: 42
+  results_root: results
+data:
+  folds_csv: workspace/fold/v1/folds.csv
+  external_index: workspace/expA00_seg_aux_baseline/src/external_index.csv
+  use_evc: false
+  use_edd2020: true
+  image_size: 384
+  gc_prescale: 512
+  aug_preset: strong
+  batch_size: 12
+  num_workers: 8
+  target_pos_ratio: 0.25
+  external_fraction: 0.15
+model:
+  family: timm_vit_lora
+  encoder_name: vit_base_patch16_siglip_384.v2_webli
+  lora_rank: 32
+  lora_alpha: 64
+  dropout: 0.0
+loss:
+  seg_weight: 0.0
+  pos_weight: null
+train:
+  ema_decay: 0.999
+optimizer:
+  lr: 0.0005
+  weight_decay: 0.01
+  eta_min: 1.0e-06
+  lora_lr_scale: 0.1
+trainer:
+  max_epochs: 20
+  precision: 16-mixed
+  accumulate_grad_batches: 1
+  gradient_clip_val: 1.0
+  log_every_n_steps: 20
+eval:
+  val_bootstrap_iter: 200
+  monitor: val/auroc
+  monitor_mode: max

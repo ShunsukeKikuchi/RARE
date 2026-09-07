@@ -87,3 +87,42 @@ submit/**/*.zip
 # ===== OS / editor =====
 .DS_Store
 *.swp
+
+# ===== must never reach a public MIT release =====
+# EndoSSL weights obtained under a private arrangement -- redistributing them is not ours to do.
+/vitl_colo_private/
+# Third-party pretrained checkpoints we converted (SurgeNet, SAM/MedSAM/SAM2, Medical-SAM3).
+# Each is redistributable only from its own origin under its own licence; the code fetches
+# or converts them, and README.md says where each comes from.
+/weights/
+*.safetensors
+# The assembled submission bundle: shipped model weights plus the manifest that indexes them.
+submit/**/resources/
+
+# Local container-test fixtures built from RARE25 training images.
+# The challenge data is not ours to redistribute; make_test_input.py regenerates these.
+submit/**/test/input/
+submit/**/test/test_manifest.csv
+
+# ===== Internal working notes: not part of the code release =====
+# Japanese day-by-day logs, handoff notes and agent configuration. The challenge
+# requires the training code to be published, not our lab notebook.
+/CLAUDE.md
+/HANDOFF.md
+/claudeSummary.md
+/competition_DIRECTION.md
+/myMemo.md
+/SETUP.md
+/daily_reports/
+/.claude/
+/submit/SUBMISSIONS.md
+
+# Per-experiment working log (Japanese); superseded by README.md for the release.
+workspace/**/SESSION_NOTES.md
+
+# Report toolchain: the organisers' template is their document, and the filled form
+# carries team contact details. method.md / method.pdf are the public method write-up.
+submit/paper/Challenge Method Report 2026.pdf
+submit/paper/method_report_filled.pdf
+submit/paper/report_fields.py
+submit/paper/fill_template.py
